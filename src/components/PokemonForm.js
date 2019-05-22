@@ -2,8 +2,8 @@ import React from 'react'
 import { Form } from 'semantic-ui-react'
 
 class PokemonForm extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
 
     this.state = {
       name: '',
@@ -11,6 +11,39 @@ class PokemonForm extends React.Component {
       frontUrl: '',
       backUrl: ''
     }
+  }
+
+  handleSubmit = (ev) => {
+    ev.preventDefault()
+    this.setState({
+      name: ev.target.elements.name.value,
+      hp: ev.target.elements.hp.value,
+      frontUrl: ev.target.elements.frontUrl.value,
+      backUrl: ev.target.elements.backUrl.value
+    })
+    fetch('http://localhost:3000/pokemon', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify({
+        name: ev.target.elements.name.value,
+        stats: [
+          {
+            value: ev.target.elements.hp.value,
+            name: 'hp'
+          }
+        ],
+        sprites: {
+          front: ev.target.elements.frontUrl.value,
+          back: ev.target.elements.backUrl.value
+        }
+      })
+    })
+      .then(resp => resp.json())
+      .then(pokemon => this.props.addPokemon(pokemon))
+      .catch(error => console.error(error))
   }
 
   render() {
